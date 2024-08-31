@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMR & Caloric Deficit Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            position: relative;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h2 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #f2f2f2;
+        }
+        .dark-mode .container {
+            background-color: #444;
+            color: #f2f2f2;
+        }
+        .dark-mode input[type="number"], .dark-mode select {
+            background-color: #555;
+            color: #f2f2f2;
+            border: 1px solid #777;
+        }
+        .toggle-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .toggle-container label {
+            margin: 0 10px 0 0;
+            font-size: 14px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        input:checked + .slider:before {
+            transform: translateX(14px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="toggle-container">
+            <label for="darkModeToggle" id="modeLabel">Dark</label>
+            <label class="switch">
+                <input type="checkbox" id="darkModeToggle" onclick="toggleDarkMode()">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <h2>BMR & Caloric Deficit Calculator</h2>
+        <label for="weight">Weight (kg):</label>
+        <input type="number" id="weight" placeholder="Enter your weight">
+
+        <label for="height">Height (cm):</label>
+        <input type="number" id="height" placeholder="Enter your height">
+
+        <label for="age">Age (years):</label>
+        <input type="number" id="age" placeholder="Enter your age">
+
+        <label for="weightLoss">Weight Loss Goal (kg/week):</label>
+        <select id="weightLoss">
+            <option value="0.5">0.5 kg/week</option>
+            <option value="1">1 kg/week</option>
+            <option value="1.5">1.5 kg/week</option>
+            <option value="2">2 kg/week</option>
+        </select>
+
+        <button onclick="calculateBMRAndDeficit()">Calculate</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function calculateBMRAndDeficit() {
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const age = parseFloat(document.getElementById('age').value);
+            const weightLossGoal = parseFloat(document.getElementById('weightLoss').value);
+
+            if (isNaN(weight) || isNaN(height) || isNaN(age)) {
+                document.getElementById('result').textContent = "Please enter valid values for weight, height, and age.";
+                return;
+            }
+
+            // BMR calculation using the Mifflin-St Jeor equation for men
+            const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+
+            // Assume a moderately active lifestyle (TDEE = BMR * 1.55)
+            const tdee = bmr * 1.55;
+
+            // Calculate the calorie deficit required to lose the desired weight per week
+            // 1 kg of body weight is roughly equal to 7,700 calories
+            const calorieDeficit = weightLossGoal * 7700;
+            const dailyCalories = tdee - (calorieDeficit / 7);
+
+            document.getElementById('result').textContent = `
+                Your BMR is ${bmr.toFixed(2)} calories/day.
+                To lose ${weightLossGoal} kg per week, you need to consume ${dailyCalories.toFixed(2)} calories/day.
+            `;
+        }
+
+        function toggleDarkMode() {
+            const body = document.body;
+            const modeLabel = document.getElementById('modeLabel');
+
+            body.classList.toggle('dark-mode');
+
+            if (body.classList.contains('dark-mode')) {
+                modeLabel.textContent = 'Light';
+            } else {
+                modeLabel.textContent = 'Dark';
+            }
+        }
+    </script>
+</body>
+</html>
